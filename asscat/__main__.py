@@ -7,7 +7,9 @@ from asyncio import (
     Server,
     StreamReader,
     StreamWriter,
-    StreamReaderProtocol, CancelledError, Event,
+    StreamReaderProtocol,
+    CancelledError,
+    Event,
 )
 
 from asyncio.streams import FlowControlMixin  # noqa
@@ -17,7 +19,7 @@ from asscat.protocols import RevshellProtocol
 from asscat.sessions import Session
 
 
-class DCatManager:
+class AssCatManager:
 
     def __init__(self):
         self.loop: AbstractEventLoop = asyncio.get_event_loop()
@@ -81,7 +83,7 @@ class DCatManager:
 
 
 async def main():
-    async with DCatManager() as dcm:
+    async with AssCatManager() as dcm:
         await dcm.start()
 
 
