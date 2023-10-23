@@ -30,7 +30,6 @@ class AssCatManager:
         self._stdout_transport: Optional[WriteTransport] = None
         self.sessions: List[Session] = []
         self.stdio_ready = Event()
-        self.session_is_ready = Event()
 
         self.loop.set_exception_handler(self.handle_exception)
 

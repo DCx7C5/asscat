@@ -32,9 +32,6 @@ class Session:
         self._cmd_history: List[bytes] = []
         self.__index: int = 0
 
-        if not self.manager.session_is_ready.is_set():
-            self.manager.session_is_ready.set()
-
     async def __aiter__(self):
         self.__index = 0
         return self
