@@ -1,4 +1,4 @@
-## AssCat
+## AssCat🍑 
 ### Async (Reverse) Shell Server  
 
 ##### (only a PoC at the moment, project name might change)
