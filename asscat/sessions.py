@@ -20,13 +20,9 @@ class Session:
         self.manager = protocol.manager
         self.socket_transport = protocol.transport
         self.socket_reader: StreamReader = protocol.reader
-        self.socket_writer: StreamWriter = StreamWriter(
-            transport=self.socket_transport,
-            protocol=self.protocol,
-            reader=self.socket_reader,
-            loop=self.loop
-        )
+        self.socket_writer: StreamWriter = protocol.writer
         self.stdin_reader: StreamReader = protocol.manager.stdin_reader
+        self.stdin_transport = protocol.manager.stdin_transport
         self.stdout_writer: StreamWriter = protocol.manager.stdout_writer
         self._session_buffer: bytes = b''
         self._cmd_history: List[bytes] = []
@@ -43,8 +39,3 @@ class Session:
             return session
         else:
             raise StopAsyncIteration
-
-    async def send_cmd(self):
-        cmd = await self.stdin_reader.readline()
-        self._cmd_history.append(cmd)
-        self.socket_writer.write(cmd)
