@@ -26,14 +26,14 @@ class RevShellSession(BaseSession):
             loop=self._loop,
         )
         self.manager = manager
-        self.conn: Optional[TCPStream] = None
+        self.stream: Optional[TCPStream] = None
         self._transport = None
         self.connection_closed: bool = True
         self._connection_closed: bool = True
         self._conn_handler_task: Optional[Task] = None
         self._data_handler_task: Optional[Task] = None
         self._send_cmd_task: Optional[Task] = None
-        self._session_id: int = next(RevShellSession.conn_counter)
+        self._session_id: int = next(BaseSession.conn_counter)
 
     def connection_made(self, transport):
         self._transport = transport
@@ -56,15 +56,15 @@ class RevShellSession(BaseSession):
             pass
 
     async def _handle_data(self):
-        data = await self.conn.read()
+        data = await self.stream.read()
         await self.manager.stdio.write(data)
 
     async def send_cmd(self):
         cmd = await self.manager.stdio.readline()
-        await self.manager.active_session.conn.write(cmd)
+        await self.manager.active_session.stream.write(cmd)
 
     def _connection_made_cb(self, reader, writer):
-        self.conn = TCPStream.create(self._loop, reader, writer)
+        self.stream = TCPStream.create(self._loop, reader, writer)
         self.manager.sessions.append(self)
         if self.manager.active_session is None:
             self.manager.active_session = self

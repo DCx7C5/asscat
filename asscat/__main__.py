@@ -45,7 +45,7 @@ class AssCatManager:
     async def shutdown(self):
         await self.stdio.close()
         for session in self.sessions:
-            await session.conn.close()
+            await session.stream.close()
         for listener in self.listeners:
             listener.close()
 
