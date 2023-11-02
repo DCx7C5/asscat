@@ -1,4 +1,5 @@
 import itertools
+from abc import ABC
 from asyncio import (
     AbstractEventLoop,
     StreamReader,
@@ -9,14 +10,17 @@ from asyncio import (
 from asyncio.streams import FlowControlMixin  # noqa
 from typing import Optional
 
-from asscat.streams import TCPStream
+from asscat.streams import SocketStream
 
 
-class BaseSession(StreamReaderProtocol):
+class BaseSession(ABC):
     conn_counter = itertools.count()
 
 
-class RevShellSession(BaseSession):
+class BaseRevShellSession(BaseSession, StreamReaderProtocol): ...
+
+
+class RevShellSession(BaseRevShellSession):
 
     def __init__(self, loop: AbstractEventLoop, manager):
         self._loop = loop
@@ -26,7 +30,7 @@ class RevShellSession(BaseSession):
             loop=self._loop,
         )
         self.manager = manager
-        self.stream: Optional[TCPStream] = None
+        self.stream: Optional[SocketStream] = None
         self._transport = None
         self.connection_closed: bool = True
         self._connection_closed: bool = True
@@ -38,7 +42,7 @@ class RevShellSession(BaseSession):
     def connection_made(self, transport):
         self._transport = transport
         super().connection_made(transport)
-        self.connection_closed = False
+        self._connection_closed = False
         self._send_cmd_task = self._loop.create_task(self.send_cmd())
 
     def data_received(self, data: bytes):
@@ -49,7 +53,7 @@ class RevShellSession(BaseSession):
 
     def connection_lost(self, exc: Exception):
         super().connection_lost(exc)
-        self.connection_closed = self._connection_closed = True
+        self._connection_closed = True
         try:
             self.manager.sessions.remove(self)
         except ValueError:
@@ -64,7 +68,7 @@ class RevShellSession(BaseSession):
         await self.manager.active_session.stream.write(cmd)
 
     def _connection_made_cb(self, reader, writer):
-        self.stream = TCPStream.create(self._loop, reader, writer)
+        self.stream = SocketStream.create(self._loop, reader, writer)
         self.manager.sessions.append(self)
         if self.manager.active_session is None:
             self.manager.active_session = self

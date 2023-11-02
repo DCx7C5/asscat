@@ -69,7 +69,7 @@ class StdIOStream(Stream):
         return self
 
 
-class TCPStream(Stream):
+class SocketStream(Stream):
 
     def __init__(self, loop: AbstractEventLoop):
         super().__init__()
