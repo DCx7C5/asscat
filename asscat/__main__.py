@@ -34,7 +34,7 @@ class AssCatManager:
         self.stdio: Optional[StdIOStream] = None
         self.listeners: List[Server] = []
         self.sessions: List[RevShellSession] = []
-        self._active_session: Optional[int] = None
+        self.active_session: Optional[RevShellSession] = None
 
     async def start(self):
         listener = await ListenerFactory.create(self._loop, self)
@@ -62,4 +62,7 @@ async def main():
 
 
 if __name__ == '__main__':
-    asyncio.run(main=main())
+    try:
+        asyncio.run(main=main())
+    except KeyboardInterrupt:
+        pass

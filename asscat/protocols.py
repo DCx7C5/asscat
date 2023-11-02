@@ -12,11 +12,11 @@ from typing import Optional
 from asscat.streams import TCPStream
 
 
-class BaseRevShellProtocol(StreamReaderProtocol): ...
-
-
-class RevShellSession(BaseRevShellProtocol):
+class BaseSession(StreamReaderProtocol):
     conn_counter = itertools.count()
+
+
+class RevShellSession(BaseSession):
 
     def __init__(self, loop: AbstractEventLoop, manager):
         self._loop = loop
@@ -61,11 +61,13 @@ class RevShellSession(BaseRevShellProtocol):
 
     async def send_cmd(self):
         cmd = await self.manager.stdio.readline()
-        await self.conn.write(cmd)
+        await self.manager.active_session.conn.write(cmd)
 
     def _connection_made_cb(self, reader, writer):
         self.conn = TCPStream.create(self._loop, reader, writer)
         self.manager.sessions.append(self)
+        if self.manager.active_session is None:
+            self.manager.active_session = self
         print(f'Connection from {self._transport.get_extra_info("peername")}', self._session_id)
 
 
