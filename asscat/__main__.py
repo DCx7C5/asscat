@@ -1,92 +1,59 @@
-import sys
 import asyncio
 from asyncio import (
     AbstractEventLoop,
-    ReadTransport,
-    WriteTransport,
     Server,
-    StreamReader,
-    StreamWriter,
-    StreamReaderProtocol,
-    CancelledError,
 )
 
-from asyncio.streams import FlowControlMixin  # noqa
 from typing import List, Optional
 
+from asscat.streams import StdIOStream
 from asscat.protocols import RevShellSession
-from asscat.sessions import Session
 
 
-class AssCatManager:
+class ListenerFactory:
 
-    def __init__(self):
-        self.loop: AbstractEventLoop = asyncio.get_event_loop()
-        self.server: Optional[Server] = None
-        self.stdin_reader: Optional[StreamReader] = None
-        self.stdin_transport: Optional[ReadTransport] = None
-        self.stdin_protocol = None
-        self.stdout_writer: Optional[StreamWriter] = None
-        self.stdout_transport: Optional[WriteTransport] = None
-        self.stdout_protocol = None
-        self.sessions: List[Session] = []
+    @classmethod
+    async def create(cls, loop, manager) -> Server:
 
-    async def start(self):
-        loop = self.loop
-
-        # Create TCP Socket Server
-        self.server = await loop.create_server(
-            protocol_factory=lambda: RevShellSession(loop=loop, manager=self),
+        server = await loop.create_server(
+            protocol_factory=lambda: RevShellSession(loop=loop, manager=manager),
             host='127.0.0.1',
             port=8888,
             reuse_port=True,
             reuse_address=True,
             start_serving=True,
         )
+        manager.listeners.append(server)
+        return server
 
-        # Create StdIn Reader, Proto, Transport
-        self.stdin_reader = asyncio.StreamReader()
-        self.stdin_protocol = lambda: StreamReaderProtocol(self.stdin_reader, loop=loop)
-        self.stdin_transport, _ = await loop.connect_read_pipe(
-            protocol_factory=self.stdin_protocol,
-            pipe=sys.stdin
-        )
 
-        # Create StdOut Writer, Proto, Transport
-        self.stdout_transport, self.stdout_protocol = await loop.connect_write_pipe(
-            protocol_factory=FlowControlMixin,
-            pipe=sys.stdout
-        )
-        self.stdout_writer = StreamWriter(
-            transport=self.stdout_transport,
-            protocol=self.stdout_protocol,
-            reader=self.stdin_reader,
-            loop=loop
-        )
+class AssCatManager:
 
-        try:
-            async with self.server:
-                await self.server.serve_forever()
-        except Exception as exc:
-            await self.handle_exception(exc, '')
+    def __init__(self):
+        self._loop: AbstractEventLoop = asyncio.get_event_loop()
+        self.stdio: Optional[StdIOStream] = None
+        self.listeners: List[Server] = []
+        self.sessions: List[RevShellSession] = []
+        self._active_session: Optional[int] = None
 
-    async def handle_exception(self, exc, msg):
-        print(f'Exception: {exc}')
-        if msg:
-            print(f'MSG: ', msg)
-        if isinstance(exc, KeyboardInterrupt):
-            self.shutdown()
-        elif isinstance(exc, CancelledError):
-            self.shutdown()
+    async def start(self):
+        listener = await ListenerFactory.create(self._loop, self)
+        self.stdio = await StdIOStream.create(self._loop)
+        async with listener:
+            await listener.serve_forever()
 
-    def shutdown(self):
-        self.server.close()
+    async def shutdown(self):
+        await self.stdio.close()
+        for session in self.sessions:
+            await session.conn.close()
+        for listener in self.listeners:
+            listener.close()
 
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.handle_exception(exc_type, exc_val)
+        await self.shutdown()
 
 
 async def main():
