@@ -28,7 +28,7 @@ class ListenerFactory:
 
 
 class AssCatManager:
-
+    """Management class that provides all the resources"""
     def __init__(self):
         self._loop: AbstractEventLoop = asyncio.get_event_loop()
         self.stdio: Optional[StdIOStream] = None
