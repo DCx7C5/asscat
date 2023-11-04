@@ -10,8 +10,22 @@ from asyncio import (
 from asyncio.streams import FlowControlMixin  # noqa
 from typing import Optional
 
+from asscat.exceptions import BufferSizeLimitError
 
 DEFAULT_LIMIT = 2 ** 16
+
+
+class AssCatReader:
+
+    __slots__ = ('_loop', '_limit')
+    _traceback = None
+
+    def __init__(self, loop: AbstractEventLoop, limit: int = None):
+        self._loop: AbstractEventLoop = loop
+        if limit is None:
+            self._limit = DEFAULT_LIMIT
+        elif limit <= 0:
+            raise BufferSizeLimitError(limit)
 
 
 class AssCatWriter:
