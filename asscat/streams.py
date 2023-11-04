@@ -134,7 +134,6 @@ class Stream(ABC):
     Abstract class that wraps a reader, writer
     or both to represent a connection
     """
-    __slots__ = ('_loop', '_reader', '_writer')
 
     def __init__(self):
         self._loop: Optional[AbstractEventLoop] = None
