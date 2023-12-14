@@ -1,0 +1,177 @@
+Screen {
+    background: $background-lighten-1;
+}
+
+Dashboard {
+    height: auto;
+    padding: 1 1 1 1;
+}
+
+SideBar {
+    dock: left;
+    max-width: 17;
+    min-width: 15;
+    padding: 0 1 0 0;
+}
+
+SideBarItem {
+    color: white;
+    width: 100%;
+    height: 3;
+    align: left middle;
+    text_style: bold;
+    padding: 0 0 0 1;
+    text_align: justify;
+    border-top: tall $panel-lighten-2;
+    border-bottom: tall $panel-darken-1;
+    margin_bottom: 1;
+}
+
+SideBarItem:hover {
+    background: $accent;
+}
+
+SideBarItem.-active {
+    border-bottom: tall $accent;
+    border-top: tall $accent;
+    color: $accent;
+}
+
+ListenerItem {
+    color: $text;
+    height: auto;
+    background: $panel-lighten-1;
+    overflow: hidden hidden;
+    layout: horizontal;
+}
+
+ListenerItem > Label {
+    height: 5;
+    align: center middle;
+    border: black;
+}
+
+ListenerItem > #hostlabel {
+    width: 22;
+}
+ListenerItem > #portlabel {
+    width: 7;
+}
+ListenerItem > Button {
+    max-width: 4;
+    align: right middle;
+}
+
+ListenerItem > #close {
+    background: darkred;
+}
+
+ListenerItem > #close :hover {
+    background: red;
+}
+
+ListenerItem > Label :hover {
+    background: $boost;
+}
+
+ListenersList > ListenerItem.--highlight {
+    background: $accent 50%;
+}
+
+ListenersList:focus > ListenerItem.--highlight {
+    background: $accent;
+}
+
+ListenerItem > Widget {
+    height: auto;
+}
+
+ListenerCreator {
+    width: 1fr;
+    layout: grid;
+    grid-size: 10 3;
+    grid-gutter: 1;
+    grid-rows: 3;
+}
+
+ListenerCreator > #hostinput {
+    column-span: 4;
+}
+
+ListenerCreator > #portinput {
+    column-span: 3;
+}
+
+ListenerCreator > #ph1 {
+    column-span: 3;
+}
+
+ListenerCreator > #protocolinput {
+    column-span: 3;
+}
+
+ListenerCreator > #sslinput {
+    column-span: 2;
+}
+
+ListenerCreator > #ph2 {
+    column-span: 5;
+}
+
+ListenerCreator > #ph3 {
+    column-span: 8;
+}
+
+ListenerCreator > #create {
+    column-span: 3;
+}
+
+ListenerItem {
+    layout: horizontal;
+}
+
+.panel {
+    padding: 1;
+    min-height: 5;
+    background: $panel;
+    border_left: tall $panel-darken-1;
+    border-bottom: tall $panel-darken-1;
+}
+
+
+#tab1 {
+    dock: right;
+    margin_right: 2;
+}
+
+/* #### EXIT SCREEN #### */
+
+ExitScreen {
+    align: center middle;
+}
+
+ExitScreen #dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 3;
+    padding: 0 1;
+    width: 60;
+    height: 11;
+    border: thick $background 80%;
+    background: $surface;
+}
+
+ExitScreen #question {
+    column-span: 2;
+    height: 1fr;
+    width: 1fr;
+    content-align: center middle;
+}
+
+ExitScreen Button {
+    width: 100%;
+}
+
+ExitScreen Button > Label {
+    color: black;
+}

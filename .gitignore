@@ -140,6 +140,7 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+asscat/.pytest_cache/
 .pytest_cache/
 cover/
 
@@ -262,3 +263,6 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,python
+
+asscat.log
+asscat/asscat.log
